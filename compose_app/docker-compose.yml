@@ -1,0 +1,40 @@
+version: '3'
+services:
+  webcamera:
+    build: ./webcamera
+    ports:  
+      - "5000:5000"
+    volumes:
+      - ./webcamera:/home/webcamera
+    environment: 
+      - FLASK_APP=camera.py
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
+    devices:
+      - /dev/video0:/dev/video0
+    command: gunicorn -w 3 -b 0.0.0.0:5000 webcamera:app --reload
+  cognexcamera:
+        build: ./cognexcamera
+        ports:  
+          - "7000:7000"
+        volumes:
+          - ./cognexcamera:/home/cognexcamera
+        environment: 
+          - FLASK_APP=camera.py
+          - FLASK_DEBUG=1
+          - PYTHONUNBUFFERED=1
+        command: gunicorn -w 3 -b 0.0.0.0:7000 cognexcamera:app --reload
+  flask_app:
+    build: ./flask_app
+    ports:
+        - "8000:8000"
+    devices:
+        - /dev/video0:/dev/video0
+    volumes: 
+        - ./flask_app:/home/flask_app
+    environment: 
+        - FLASK_APP=flask_server.py
+        - FLASK_DEBUG=1
+        - PYTHONUNBUFFERED=1
+    command: gunicorn -w 3 -b 0.0.0.0:8000 flask_server:app --reload       
+        

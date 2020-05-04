@@ -1,0 +1,22 @@
+version: '3'
+services:
+  flask_server:
+    build: ./flask_server
+    ports:  
+      - "5000:5000"
+    volumes:
+      - ./flask_server:/home/project
+    environment: 
+      - FLASK_APP=flask_server.py
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
+    devices:
+      - /dev/video0:/dev/video0
+    command: gunicorn -w 1 -b 0.0.0.0:5000 flask_server:app --reload
+    #flask run --host=0.0.0.0
+  nginx:
+    build: ./nginx
+    ports:  
+      - "80:80"
+    volumes:
+      - ./nginx:/home/project/nginx
